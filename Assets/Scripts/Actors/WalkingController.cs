@@ -1,14 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MovementController : MonoBehaviour {
+public class WalkingController : MonoBehaviour {
 
 	public float moveSpeed_ = 12.0f;
-	public float jumpForceHorizontal_ = 750f;
-	public float jumpForceVertical_ = 1250f;
-	public float jumpingDelay_ = 0.1f;
-
-	private float jumpTime_ = 0f;
+	
 	private StateMachine stateMachine_ = null;
 
 	// Use this for initialization
@@ -102,44 +98,5 @@ public class MovementController : MonoBehaviour {
 		if ((no_move) && (stateMachine_)) {
 			stateMachine_.changeStateTimed ( StateMachine.State.stop_moving, -1f, StateMachine.State.idle );
 		}
-
-		// ------------------------------------------------
-		// separately check for jumping
-		bool jump_flag = false;
-		if ((Time.time > jumpTime_) && (Input.GetAxis ("Jump") > 0.0f)) {
-
-			// check for the state machine
-			if (stateMachine_) {
-				stateMachine_.changeState (StateMachine.State.jumping);
-			}
-
-			// set the flag in case we're not running in a state machine
-			jump_flag = true;
-		}
-
-		// change flag based on state machine if present
-		if (stateMachine_) {
-			jump_flag = (stateMachine_.currState_ == StateMachine.State.jumping);
-		}
-
-		if (jump_flag) {
-			jumpTime_ = Time.time + jumpingDelay_;
-			Rigidbody2D body = GetComponent<Rigidbody2D>();
-			body.AddForce( new Vector2( Input.GetAxis ("Horizontal") * jumpForceHorizontal_, jumpForceVertical_ ) );
-		}
 	}
-	/*
-	void OnCollisionEnter2D(Collision2D coll)
-	{
-
-			landed_ = true;
-
-	}
-
-	void OnCollisionExit2D(Collision2D coll)
-	{
-
-			landed_ = false;
-
-	}*/
 }
