@@ -9,13 +9,14 @@ public class JumpingAndFallingController : MonoBehaviour {
 
 	private float jumpTime_ = 0f;
 	private StateMachine stateMachine_ = null;
+	public int numCurrentColls = 0;
 	public bool landed_ = false;
 
 	// Use this for initialization
 	void Start () {
 	
 		// We have states so grab it if there is one
-		stateMachine_ = GetComponent<StateMachine>();
+		stateMachine_ = transform.parent.GetComponent<StateMachine>();
 	}
 	
 	// Update is called once per frame
@@ -42,28 +43,37 @@ public class JumpingAndFallingController : MonoBehaviour {
 		
 		if (jump_flag) {
 			jumpTime_ = Time.time + jumpingDelay_;
-			Rigidbody2D body = GetComponent<Rigidbody2D>();
+			Rigidbody2D body = transform.parent.GetComponent<Rigidbody2D>();
 			body.AddForce( new Vector2( Input.GetAxis ("Horizontal") * jumpForceHorizontal_, jumpForceVertical_ ) );
 		}
 	}
 	
-	void OnCollisionEnter2D(Collision2D coll)
+	void OnTriggerEnter2D( Collider2D obj )
 	{
 		// check if we've hit the ground
 		landed_ = true;
+		numCurrentColls++;
 
 		if (stateMachine_) {
+			// switch to a landing state
 			stateMachine_.changeStateTimed ( StateMachine.State.landing, -1f, StateMachine.State.idle );
 		}
 	}
 
-	void OnCollisionExit2D(Collision2D coll)
+	void OnTriggerExit2D(Collider2D coll)
 	{
 		// check if we've left the ground
-		landed_ = false;
+		numCurrentColls--;
+		if (numCurrentColls <= 0)
+		{
+			landed_ = false;
 
-		if (stateMachine_) {
-			stateMachine_.changeState( StateMachine.State.falling );
+			if (stateMachine_) {
+				// we're falling
+				stateMachine_.changeState( StateMachine.State.falling );
+			}
 		}
+
+
 	}
 }
