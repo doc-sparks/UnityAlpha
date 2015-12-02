@@ -4,7 +4,8 @@ using System.Collections;
 public class DetonateGrenade : MonoBehaviour {
 
 	public float timeToDeath_ = 2f;
-	
+	public GameObject projectilePrefab_ = null;
+
 	private float initTime_;
 	
 	// Use this for initialization
@@ -25,14 +26,26 @@ public class DetonateGrenade : MonoBehaviour {
 	void detonate() {
 
 		// set blocks in range free and produce force
+		float max_dist = 7.0f;
+		float fmax = 2000.0f;
+
 		foreach (GameObject obj in GameObject.FindGameObjectsWithTag ("Scenery")) {
-			if (Vector3.Distance( obj.transform.position, transform.position ) < 5.0f )
+			float d = Vector3.Distance( obj.transform.position, transform.position );
+
+			if ( (d < max_dist ) && ( d > 0 ) )
 			{
-				Rigidbody2D body = obj.GetComponent<Rigidbody2D>();
-				body.isKinematic = false;
+				GameObject new_obj = (GameObject)Instantiate (projectilePrefab_);
+				new_obj.transform.position = obj.transform.position;
+
+				Destroy(obj);
+
+				Rigidbody2D body = new_obj.GetComponent<Rigidbody2D>();
 
 				//body.velocity = new Vector2(0f, 1f);
-				body.AddForce( new Vector2(0f, 1000f) );
+				float fmag = (fmax / 10.0f ) * max_dist / d;
+				if (fmag > fmax) 
+					fmag = fmax;
+				body.AddForce( (new_obj.transform.position - transform.position).normalized * fmax );
 				//body.Sleep();
 			}
 		}

@@ -26,17 +26,28 @@ public class ShootGun : MonoBehaviour {
 			if (Time.time > fireTime_)
 			{
 				fireTime_ = Time.time + firingDelay_;
-				/*
+			
 				// launch the bullet
 				GameObject bullet = (GameObject) Instantiate(bulletPrefab_);
 				bullet.transform.position = transform.position;
 				Rigidbody2D body = bullet.GetComponent<Rigidbody2D>();
 				body.velocity = transform.right * bulletSpeed_;
-				*/
+			}
+		}
 
-				// set the grenade
+		// Check for Grenade
+		if (Input.GetAxis ("Fire2") > 0f) {
+			
+			// Check delay
+			if (Time.time > fireTime_)
+			{
+				fireTime_ = Time.time + firingDelay_;
+
+				// launch the grenade
 				GameObject grenade = (GameObject) Instantiate(grenadePrefab_);
-				grenade.transform.position = new Vector3(0, 1, 0);
+				grenade.transform.position = transform.position;
+				Rigidbody2D body = grenade.GetComponent<Rigidbody2D>();
+				body.velocity = transform.right * bulletSpeed_;
 			}
 		}
 	}
